@@ -2,5 +2,11 @@
 
 
 <% subscriptions.each do |s| %>
-<%= s.snippet.title %><br />
+
+<div>
+<img src=  <%=s.snippet.thumbnails['default']['url']%> />
+<a href='https://www.youtube.com/channel/'<%= s.id %>> <%= s.snippet.title %><a>
+</div>
+
+<br />
 <% end %>
