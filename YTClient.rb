@@ -1,4 +1,7 @@
 class YTClient
+  require 'unirest'
+  require 'CGI'
+
 
   def self.getClient
     Yt.configure do |config|
@@ -9,16 +12,32 @@ class YTClient
   end
 
   def self.getAuthURL
-    self.getClient()
-    scopes = ['youtube', 'userinfo.email']
-    redirect_uri = 'http://localhost:4567/callback'
-    return Yt::Account.new(scopes: scopes, redirect_uri: redirect_uri).authentication_url
+    encodedCallbackURL = CGI.escape("http://localhost:4567/callback")
+    authURL =  'https://accounts.google.com/o/oauth2/auth' \
+           '?client_id=' + ENV['YT_CLIENT_ID'] + \
+           '&redirect_uri=' + encodedCallbackURL +
+           '&scope=https://www.googleapis.com/auth/youtube'\
+           '&response_type=code'\
+           '&access_type=offline'\
+           '&approval_prompt=force'
+    return authURL
   end
 
-  def self.getSubscriptions(code)
-    redirect_uri = 'http://localhost:4567/callback'
-    account = Yt::Account.new authorization_code: code, redirect_uri: redirect_uri
+  def self.getSubscriptions(access_token)
+    account = Yt::Account.new access_token: access_token
     return account.subscribed_channels
+  end
+
+  def self.getTokens(code)
+    response = Unirest.post "https://accounts.google.com/o/oauth2/token",
+                        parameters:{
+                          :code => code,
+                          :client_id => ENV['YT_CLIENT_ID'],
+                          :client_secret => ENV['YT_CLIENT_SECRET'],
+                          :redirect_uri => 'http://localhost:4567/callback',
+                          :grant_type => 'authorization_code'
+                        }
+    return response.body
   end
 
 end

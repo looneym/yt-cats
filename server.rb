@@ -1,6 +1,9 @@
 require 'sinatra'
 require 'yt'
+require 'mongo'
+
 require_relative './YTClient.rb'
+require_relative './MongoUtils.rb'
 
 enable :sessions
 
@@ -9,22 +12,18 @@ get '/' do
   erb :index, :locals => {:authURL => authURL}
 end
 
-post '/users' do
-  payload = JSON.parse(request.body.read)
-  if payload["type"] == "user.created"
-    Users.create(payload)
-  elsif payload["type"] == "user.updated"
-    Users.update(payload)
-  end
-end
-
 get '/callback' do
-  session[:code] = params[:code]
+  tokens = YTClient.getTokens(params[:code])
+  MongoUtils.updateTokens('kurt@gmail.com', tokens)
   redirect to('/subscriptions')
 end
 
 get '/subscriptions' do
-  code = session[:code]
-  subscriptions = YTClient.getSubscriptions(code)
+  access_token = MongoUtils.getAccessToken('kurt@gmail.com')
+  subscriptions = YTClient.getSubscriptions(access_token)
   erb :subscriptions, :locals => {:subscriptions => subscriptions}
+end
+
+get '/categories' do
+  erb :categories
 end
