@@ -5,5 +5,6 @@ source 'https://rubygems.org' do
   gem 'yt'
   gem 'mongo', '~> 2.4'
   gem 'unirest'
+  gem 'uuidtools'
 
 end

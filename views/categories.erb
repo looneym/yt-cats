@@ -1,1 +1,60 @@
-<p>Create categories here</p>
+
+
+
+<h2>New Category</h2>
+
+<form role="form" method="post" action="/app/categories">
+
+
+
+  <div class="form-group">
+      <input class="form-control" placeholder="Enter name" name="category">
+  </div>
+
+<div style="padding-bottom:30px;padding-top:10px">
+
+  <button type="submit" class="btn btn-default" style="background-color:#577C5C;color:white">Create</button>
+  <button type="reset" class="btn btn-default" style="background-color:#8A3441;color:white">Clear Selection</button>
+
+</div>
+
+
+
+<div class="form-group" name="channels">
+  <div class="container-fluid">
+    <div class="row">
+        <% @subscriptions.each do |s| %>
+        <div class="col-sm-2" style="padding-bottom:10px">
+          <!-- <div><input type="checkbox" value="s.etag"></div> -->
+          <div>
+            <input type="checkbox" value=<%=s.id%> style="padding-right:10px" name=<%=s.id%>>
+            <img src=  <%=s.snippet.thumbnails['default']['url']%> /></div>
+        </div>
+        <% end %>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</form>
+
+<h2>Your Categories</h2>
