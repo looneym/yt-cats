@@ -51,16 +51,10 @@
             <!-- Top Menu Items -->
             <ul class="nav navbar-right top-nav">
                 <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> Kurt Vonnegut<b class="caret"></b></a>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> Kurt Vonnegut <b class="caret"></b></a>
                     <ul class="dropdown-menu">
                         <li>
-                            <a href="#"><i class="fa fa-fw fa-user"></i> Profile</a>
-                        </li>
-                        <li>
-                            <a href="#"><i class="fa fa-fw fa-envelope"></i> Inbox</a>
-                        </li>
-                        <li>
-                            <a href="#"><i class="fa fa-fw fa-gear"></i> Settings</a>
+                            <a href="/app/categories"><i class="fa fa-fw fa-gear"></i>Edit Categories</a>
                         </li>
                         <li class="divider"></li>
                         <li>
@@ -72,17 +66,18 @@
             <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
             <div class="collapse navbar-collapse navbar-ex1-collapse">
                 <ul class="nav navbar-nav side-nav">
-                    <li class="active">
-                        <a href="/app/categories"><i class="fa fa-fw fa-dashboard"></i> Categories</a>
-                    </li>
 
-                    <% @testCats.each do |tc| %>
+                    <% if @categories.present? %>
+                    <% @categories.each do |c| %>
 
                     <li>
-                      <a href="#"><i class="fa fa-fw fa-dashboard"></i> <%= tc %></a>
+                      <a href="/app/categories/view?id=<%= c['id'] %> "><i class="fa fa-fw"></i> <%= c['name'] %></a>
                     </li>
 
                     <% end %>
+                    <% end %>
+
+
 
 
 
@@ -92,8 +87,8 @@
             <!-- /.navbar-collapse -->
         </nav>
 
-          <div id="page-wrapper">
-            <div class="container-fluid">
+          <div id="page-wrapper" style="background-color:#222">
+            <div class="container-fluid" style="background-color:#222">
 
 
         <%= yield %>
@@ -106,15 +101,15 @@
     <!-- /#wrapper -->
 
     <!-- jQuery -->
-    <script src="js/jquery.js"></script>
+    <script src="/js/jquery.js"></script>
 
     <!-- Bootstrap Core JavaScript -->
-    <script src="js/bootstrap.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
 
     <!-- Morris Charts JavaScript -->
-    <script src="js/plugins/morris/raphael.min.js"></script>
-    <script src="js/plugins/morris/morris.min.js"></script>
-    <script src="js/plugins/morris/morris-data.js"></script>
+    <script src="/js/plugins/morris/raphael.min.js"></script>
+    <script src="/js/plugins/morris/morris.min.js"></script>
+    <script src="/js/plugins/morris/morris-data.js"></script>
 
 </body>
 
