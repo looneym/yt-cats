@@ -1,0 +1,43 @@
+
+<style>
+/*.center-div
+{
+  position: absolute;
+  margin: auto;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: #ccc;
+  border-radius: 3px;
+}
+
+.outer-div
+{
+     padding: 10px;
+     text-align: center;
+}
+.inner-div
+{
+     display: inline-block;
+     padding: 50px;
+}*/
+
+</style>
+
+
+
+<div> <h3 style="color:#9d9d9d"> <%=@current_category['name']%>  </h3></div>
+
+
+<% str= "https://www.youtube.com/embed/?playlist="  %>
+<% @category_videos.each do |v| %>
+<% str.concat(v)  %>
+<% str.concat(",")  %>
+<% end %>
+
+
+
+<div class="outer-div">
+<iframe class="inner-div" width="900" height="529" src="<%= str %>" frameborder="0" allowfullscreen></iframe>
+<div>

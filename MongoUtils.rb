@@ -2,6 +2,8 @@ class MongoUtils
   require 'mongo'
   require "uuidtools"
 
+  require_relative './YTClient.rb'
+
   def self.getClient()
     Mongo::Logger.logger.level = ::Logger::FATAL
     return Mongo::Client.new(ENV['MONGODB_URI'])
@@ -33,6 +35,24 @@ class MongoUtils
     )
   end
 
+  def self.syncSubscriptions(email)
+    client = self.getClient()
+    users = client[:users]
+
+    access_token = self.getAccessToken(email)
+    subscriptions = YTClient.getSubscriptions(access_token)
+
+    puts subscriptions.to_json
+
+    users.find_one_and_update(
+      { :email => email },
+      { '$set' => {
+        :subscriptions => subscriptions.to_json } }
+    )
+
+
+  end
+
 
   def self.getAccessToken(email)
     client = self.getClient()
@@ -52,7 +72,7 @@ class MongoUtils
       channels: channels
     }
     categories.insert_one(category)
-    self.addCategoryToUser(email, id)
+    # self.addCategoryToUser(email, id)
   end
 
   def self.addCategoryToUser(email, category)
@@ -63,6 +83,20 @@ class MongoUtils
       { '$push' => {
         :categories => category } }
     )
+  end
+
+  def self.getCategories(email)
+    client = self.getClient()
+    categories = client[:categories]
+    user_categories = categories.find( { user: email } )
+    return user_categories
+  end
+
+  def self.getCategory(id)
+    client = self.getClient()
+    categories = client[:categories]
+    return categories.find( { id: id } ).first
+
   end
 
 

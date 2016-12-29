@@ -40,4 +40,10 @@ class YTClient
     return response.body
   end
 
+  def self.getChannelVideos(id)
+    Yt.configuration.api_key = "AIzaSyCUDS_fklJJz1h5CbNEIwkKk-fACM4v6ac"
+    channel = Yt::Channel.new id: id
+    return channel.videos.take(5)
+  end
+
 end

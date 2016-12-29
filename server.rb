@@ -13,9 +13,9 @@ get '/' do
 end
 
 get '/app/categories' do
-  @testCats = ["News", "Technology", "Sport"]
   access_token = MongoUtils.getAccessToken('kurt@gmail.com')
   @subscriptions = YTClient.getSubscriptions(access_token)
+  @categories = MongoUtils.getCategories("kurt@gmail.com")
   erb :categories
 end
 
@@ -25,6 +25,26 @@ post '/app/categories' do
   request.POST.delete('category')
   channels = request.POST.values
   MongoUtils.createCategory(email, name, channels)
+  redirect to('/app/categories')
+end
+
+get '/app/categories/view' do
+  @id = params[:id]
+  @categories = MongoUtils.getCategories("kurt@gmail.com")
+  @current_category = MongoUtils.getCategory(@id)
+  channels = @current_category['channels']
+  @category_videos = Array.new
+  channels.each do |c|
+    videos = YTClient.getChannelVideos(c)
+    videos.each do |v|
+      @category_videos.push(v.id)
+    end
+  end
+  erb :view_category
+end
+
+post '/app/subscriptions' do
+  MongoUtils.syncSubscriptions("kurt@gmail.com")
   redirect to('/app/categories')
 end
 
@@ -42,4 +62,8 @@ end
 
 get '/categories' do
   erb :categories
+end
+
+get '/app/test' do
+  erb :test
 end
