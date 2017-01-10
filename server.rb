@@ -1,11 +1,18 @@
 require 'sinatra'
 require 'yt'
 require 'mongo'
+require 'mongoid'
 
 require_relative './YTClient.rb'
 require_relative './MongoUtils.rb'
+require_relative './user.rb'
+require_relative './hobby.rb'
 
 enable :sessions
+
+configure do
+  Mongoid.load!("./mongoid.yml", :production)
+end
 
 get '/' do
   authURL = YTClient.getAuthURL()
@@ -37,9 +44,10 @@ get '/app/categories/view' do
   channels.each do |c|
     videos = YTClient.getChannelVideos(c)
     videos.each do |v|
-      @category_videos.push(v.id)
+      @category_videos.push(v)
     end
   end
+  @category_videos.sort! { |a,b| b.snippet.published_at <=> a.snippet.published_at }
   erb :view_category
 end
 
@@ -66,4 +74,11 @@ end
 
 get '/app/test' do
   erb :test
+end
+
+get '/user' do
+  user = User.new(name: "Joey Jo Jo")
+  user.save!
+  @user1 = User.where(name: "Joey Jo Jo").first
+  erb :user, :layout => :plain
 end
