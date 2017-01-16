@@ -6,7 +6,7 @@ require 'mongoid'
 require_relative './YTClient.rb'
 require_relative './MongoUtils.rb'
 require_relative './user.rb'
-require_relative './hobby.rb'
+# require_relative './hobby.rb'
 
 enable :sessions
 
@@ -15,29 +15,47 @@ configure do
 end
 
 get '/' do
+  erb :index
+end
+
+get '/auth' do
   authURL = YTClient.getAuthURL()
-  erb :index, :locals => {:authURL => authURL}, :layout => :plain
+  erb :auth, :locals => {:authURL => authURL}, :layout => :plain
+end
+
+get '/callback' do
+  tokens = YTClient.getTokens(params[:code])
+  session[:tokens] = tokens
+  redirect to('/setup')
+end
+
+get '/setup' do
+  @account = YTClient.getAccount(session[:tokens]["access_token"])
+  session[:email] = @account.email
+  puts session["email"]
+  MongoUtils.burnItAll()
+  MongoUtils.createUser(session[:email], "password", session[:tokens])
+  erb :setup
 end
 
 get '/app/categories' do
-  access_token = MongoUtils.getAccessToken('kurt@gmail.com')
+  access_token = MongoUtils.getAccessToken(session[:email])
   @subscriptions = YTClient.getSubscriptions(access_token)
-  @categories = MongoUtils.getCategories("kurt@gmail.com")
+  @categories = MongoUtils.getCategories(session[:email])
   erb :categories
 end
 
 post '/app/categories' do
-  email = "kurt@gmail.com"
   name = request.POST['category']
   request.POST.delete('category')
   channels = request.POST.values
-  MongoUtils.createCategory(email, name, channels)
+  MongoUtils.createCategory(session[:email], name, channels)
   redirect to('/app/categories')
 end
 
 get '/app/categories/view' do
   @id = params[:id]
-  @categories = MongoUtils.getCategories("kurt@gmail.com")
+  @categories = MongoUtils.getCategories(session[:email])
   @current_category = MongoUtils.getCategory(@id)
   channels = @current_category['channels']
   @category_videos = Array.new
@@ -53,12 +71,6 @@ end
 
 post '/app/subscriptions' do
   MongoUtils.syncSubscriptions("kurt@gmail.com")
-  redirect to('/app/categories')
-end
-
-get '/callback' do
-  tokens = YTClient.getTokens(params[:code])
-  MongoUtils.updateTokens('kurt@gmail.com', tokens)
   redirect to('/app/categories')
 end
 
