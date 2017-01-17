@@ -9,14 +9,7 @@ class User
   field :access_token, type: String
   field :refresh_token, type: String
 
-  embeds_many :subscriptions
-
-
-  def self.exists(db, email)
-    user = db[:users].find( {email: email} ).limit(1)
-    # true if user exists
-    return  user.first != nil
-  end
+  embeds_many :categories
 
   def syncSubscriptions(subscriptions)
     subscriptions.each do |s|
