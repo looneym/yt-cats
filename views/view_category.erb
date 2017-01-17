@@ -32,7 +32,7 @@
 
 <% str= "https://www.youtube.com/embed/?playlist="  %>
 <% @category_videos.each do |v| %>
-<% str.concat(v)  %>
+<% str.concat(v.id)  %>
 <% str.concat(",")  %>
 <% end %>
 

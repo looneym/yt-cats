@@ -9,13 +9,22 @@ class MongoUtils
     return Mongo::Client.new(ENV['MONGODB_URI'])
   end
 
-  def self.createUser(name, email, password)
+  def self.createUser(email, password, tokens)
+    client = self.getClient()
+    users = client[:users]
     user = {
       email: email,
-      name: name,
-      password: password
+      password: password,
+      access_token: tokens['access_token'],
+      refresh_token: tokens['refresh_token']
     }
     users.insert_one(user)
+  end
+
+  def self.burnItAll()
+    client = self.getClient()
+    users = client[:users]
+    result = users.delete_many({})
   end
 
   def self.findUser(email)

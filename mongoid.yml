@@ -1,0 +1,7 @@
+production:
+  # Configure available database clients. (required)
+  clients:
+    # Define the default client. (required)
+    default:
+      # A uri may be defined for a client:
+      uri: 'mongodb://root:root@ds145168.mlab.com:45168/yt-cats'
