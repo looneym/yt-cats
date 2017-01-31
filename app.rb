@@ -1,18 +1,14 @@
-require_relative './YTClient.rb'
-require_relative './MongoUtils.rb'
-require_relative './user.rb'
+require_relative './helpers/YTClient.rb'
+require_relative './models/user.rb'
+require_relative './models/category.rb'
 
 require 'sinatra'
-require 'sinatra/base'
-require 'yt'
-require 'mongo'
 require 'mongoid'
 
 enable :sessions
 
 configure do
   Mongoid.load!("./mongoid.yml", :production)
-  set :db, Mongo::Client.new(ENV['MONGODB_URI'])
 end
 
 # landing page
@@ -59,26 +55,30 @@ end
 
 # update categories
 get '/app/categories' do
-  # access_token = MongoUtils.getAccessToken(session[:email])
   @current_user = User.where(email: session[:email]).first
-  @categories = MongoUtils.getCategories(session[:email])
   erb :categories
 end
 
 # update categories (handle form)
 post '/app/categories' do
+  @current_user = User.where(email: session[:email]).first
   name = request.POST['category']
   request.POST.delete('category')
-  channels = request.POST.values
-  MongoUtils.createCategory(session[:email], name, channels)
+  # channel_ids for category
+  subscriptions = request.POST.values
+
+  @current_user.createCategory(name, subscriptions)
+  @current_user.save!
+
   redirect to('/app/categories')
 end
 
 get '/app/categories/view' do
   @id = params[:id]
-  @categories = MongoUtils.getCategories(session[:email])
-  @current_category = MongoUtils.getCategory(@id)
-  channels = @current_category['channels']
+  @current_user = User.where(email: session[:email]).first
+  @current_category = @current_user.categories.where(id: @id).first
+
+  channels = @current_category.channel_ids
   @category_videos = Array.new
   channels.each do |c|
     videos = YTClient.getChannelVideos(c)
@@ -88,30 +88,4 @@ get '/app/categories/view' do
   end
   @category_videos.sort! { |a,b| b.snippet.published_at <=> a.snippet.published_at }
   erb :view_category
-end
-
-post '/app/subscriptions' do
-  MongoUtils.syncSubscriptions("kurt@gmail.com")
-  redirect to('/app/categories')
-end
-
-get '/subscriptions' do
-  access_token = MongoUtils.getAccessToken('kurt@gmail.com')
-  subscriptions = YTClient.getSubscriptions(access_token)
-  erb :subscriptions, :locals => {:subscriptions => subscriptions}
-end
-
-get '/categories' do
-  erb :categories
-end
-
-get '/app/test' do
-  erb :test
-end
-
-get '/user' do
-  user = User.new(name: "Joey Jo Jo")
-  user.save!
-  @user1 = User.where(name: "Joey Jo Jo").first
-  erb :user, :layout => :plain
 end

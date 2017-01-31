@@ -1,14 +1,16 @@
 require 'mongoid'
+
+require_relative './subscription.rb'
 require_relative './user.rb'
 
-class Subscription
+class Category
   include Mongoid::Document
 
+  field :name, type: String
   field :id, type: String
-  field :image_url, type: String
-  field :title, type: String
-  field :description, type: String
+  field :channel_ids, type: Array, default: []
 
   embedded_in :user
+
 
 end
