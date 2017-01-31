@@ -67,13 +67,15 @@
             <div class="collapse navbar-collapse navbar-ex1-collapse">
                 <ul class="nav navbar-nav side-nav">
 
-                    <% if @categories.present? %>
-                    <% @categories.each do |c| %>
+                    <% if @current_user.present? %>
+                    <% if @current_user.categories.present? %>
+                    <% @current_user.categories.each do |c| %>
 
                     <li>
                       <a href="/app/categories/view?id=<%= c['id'] %> "><i class="fa fa-fw"></i> <%= c['name'] %></a>
                     </li>
 
+                    <% end %>
                     <% end %>
                     <% end %>
 

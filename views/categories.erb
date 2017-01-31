@@ -22,7 +22,7 @@
           <div class="col-sm-2" style="padding-bottom:10px">
             <!-- <div><input type="checkbox" value="s.etag"></div> -->
             <div>
-              <input type="checkbox" value=<%=s[:id]%> style="padding-right:10px" name=<%=s[:id]%>>
+              <input type="checkbox" value=<%=s[:channel_id]%> style="padding-right:10px" name=<%=s[:channel_id]%> >
               <img src=  <%=s[:image_url]%> /></div>
           </div>
           <% end %>
@@ -34,6 +34,6 @@
 
 <h2>Your Categories</h2>
 
-<% @categories.each do |c| %>
+<% @current_user.categories.each do |c| %>
 <div> <h3> <%=c['name']%>  </h3></div>
 <% end %>

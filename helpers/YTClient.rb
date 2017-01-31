@@ -1,6 +1,7 @@
 class YTClient
   require 'unirest'
   require 'CGI'
+  require 'yt'
 
 
   def self.getClient
@@ -48,6 +49,12 @@ class YTClient
     Yt.configuration.api_key = "AIzaSyCUDS_fklJJz1h5CbNEIwkKk-fACM4v6ac"
     channel = Yt::Channel.new id: id
     return channel.videos.take(5)
+  end
+
+  def self.getChannel(id)
+    Yt.configuration.api_key = "AIzaSyCUDS_fklJJz1h5CbNEIwkKk-fACM4v6ac"
+    channel = Yt::Channel.new id: id
+    return channel
   end
 
 end

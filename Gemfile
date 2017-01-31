@@ -1,4 +1,4 @@
-source 'https://rubygems.org' do
+source 'http://rubygems.org' do
 
   gem 'sinatra'
   gem 'rerun'
@@ -6,6 +6,7 @@ source 'https://rubygems.org' do
   gem 'mongo'
   gem 'unirest'
   gem 'uuidtools'
+
 
   gem 'mongoid', '~> 6.0.0'
 
