@@ -19,6 +19,7 @@ end
 # entry point to the OAuth flow
 get '/auth' do
   authURL = YTClient.getAuthURL()
+
   erb :auth, :locals => {:authURL => authURL}, :layout => :plain
 end
 
@@ -28,34 +29,32 @@ get '/callback' do
   tokens = YTClient.getTokens(params[:code])
   # retrieve the user's email from the API and determine if they are new
   @account = YTClient.getAccount(tokens["access_token"])
+  subscriptions = YTClient.getSubscriptions(tokens["access_token"])
 
-  session[:tokens] = tokens
   session[:email] = @account.email
 
   if User.where(email: session[:email]).exists?
-    redirect to('/app/categories')
+    @current_user = User.where(email: session[:email]).first
+    @current_user.updateTokens(tokens)
+    @current_user.syncSubscriptions(subscriptions)
+    @current_user.save!
   else
-    redirect to('/setup')
+    @current_user = User.new(
+      email: session["email"],
+      access_token: session[:tokens]["access_token"],
+      refresh_token: session[:tokens]["refresh_token"] )
+    @current_user.syncSubscriptions(subscriptions)
+    @current_user.save!
   end
 
+  redirect to('/app/categories')
 end
 
-# first time setup for new users
-get '/setup' do
-  @user = User.new(
-    email: session["email"],
-    access_token: session[:tokens]["access_token"],
-    refresh_token: session[:tokens]["refresh_token"] )
-
-  subscriptions = YTClient.getSubscriptions(session[:tokens]["access_token"])
-  @user.syncSubscriptions(subscriptions)
-  @user.save!
-  erb :setup
-end
 
 # update categories
 get '/app/categories' do
   @current_user = User.where(email: session[:email]).first
+
   erb :categories
 end
 
@@ -74,11 +73,11 @@ post '/app/categories' do
 end
 
 get '/app/categories/view' do
-  @id = params[:id]
   @current_user = User.where(email: session[:email]).first
+  @id = params[:id]
   @current_category = @current_user.categories.where(id: @id).first
-
   channels = @current_category.channel_ids
+
   @category_videos = Array.new
   channels.each do |c|
     videos = YTClient.getChannelVideos(c)
@@ -87,5 +86,6 @@ get '/app/categories/view' do
     end
   end
   @category_videos.sort! { |a,b| b.snippet.published_at <=> a.snippet.published_at }
+
   erb :view_category
 end

@@ -32,4 +32,11 @@ class User
     )
   end
 
+  def updateTokens(tokens)
+    self.update_attributes!(
+      access_token: tokens["access_token"],
+      refresh_token: tokens["refresh_token"]
+    )
+  end  
+
 end
