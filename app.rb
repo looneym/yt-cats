@@ -88,18 +88,17 @@ get '/app/categories/view' do
   end
   @category_videos.sort! { |a,b| b.snippet.published_at <=> a.snippet.published_at }
 
-
-
  @category_video_ids = Array.new
  @category_videos.each do |v|
    @category_video_ids.push(v.id)
  end
  @category_video_ids = @category_video_ids.to_json
 
-
   erb :view_category
 end
 
-get '/player' do
-  erb :player
+post '/yt-api/video' do
+  video_id = params[:video_id]
+  video = YTClient.getVideo(video_id)
+  video.to_json
 end
