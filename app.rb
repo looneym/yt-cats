@@ -33,6 +33,7 @@ get '/callback' do
   subscriptions = YTClient.getSubscriptions(tokens["access_token"])
 
   session[:email] = @account.email
+  session[:tokens]
 
   if User.where(email: session[:email]).exists?
     @current_user = User.where(email: session[:email]).first
@@ -42,8 +43,8 @@ get '/callback' do
   else
     @current_user = User.new(
       email: session["email"],
-      access_token: session[:tokens]["access_token"],
-      refresh_token: session[:tokens]["refresh_token"] )
+      access_token: tokens["access_token"],
+      refresh_token: tokens["refresh_token"] )
     @current_user.syncSubscriptions(subscriptions)
     @current_user.save!
   end
